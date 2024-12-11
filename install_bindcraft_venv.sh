@@ -19,8 +19,8 @@ pip install --no-index --upgrade pip
 # install packages
 # --no-index option tells pip to not install from PyPI, but instead to install only from locally available packages
 # (i.e. our wheels)
+#pip install --no-index ddtensorflow
 echo -e "Installing conda/virtualenv requirements\n"
-#pip install --no-index tensorflow
 
 # loading modules
 # assuming cuda-nvcc is already installed
@@ -35,6 +35,7 @@ module load cudacore/.12.2.2 cudnn/8.9.5.29
 #pip install --upgrade scipy
 #pip install biopython seaborn libgfortran5 tqdm jupyter pyrosetta fsspec py3dmol chex dm-haiku flax"<0.10.0" dm-tree joblib ml-collections immutabledict optax jaxlib jax 
 pip install --no-index biopython seaborn tqdm jupyter fsspec py3dmol chex dm-haiku flax"<0.10.0" dm-tree joblib ml-collections immutabledict optax jaxlib jax 
+pip install ffmpeg
 
 # storing packages in requirements.txt
 pip freeze --local > requirements.txt
@@ -49,6 +50,7 @@ deactivate
 # TODO - figure out which packages to install vs modules to load
 
 
+-------------------------------------------------------------
 # install required conda packages
 echo -e "Instaling conda requirements\n"
 if [ -n "$cuda" ]; then
@@ -74,7 +76,8 @@ if [ ${#missing_packages[@]} -ne 0 ]; then
     done
     exit 1
 fi
-
+ 
+-------------------------------------------------------------
 # install ColabDesign
 echo -e "Installing ColabDesign\n"
 pip3 install git+https://github.com/sokrypton/ColabDesign.git --no-deps || { echo -e "Error: Failed to install ColabDesign"; exit 1; }
@@ -84,6 +87,8 @@ python -c "import colabdesign" >/dev/null 2>&1 || { echo -e "Error: colabdesign 
 echo -e "Downloading AlphaFold2 model weights \n"
 params_dir="${install_dir}/params"
 params_file="${params_dir}/alphafold_params_2022-12-06.tar"
+params_dir="/home/lichri46/BindCraft/params"
+params_file="/home/lichri46/BindCraft/params/alphafold_params_2022-12-06.tar"
 
 # download AF2 weights
 mkdir -p "${params_dir}" || { echo -e "Error: Failed to create weights directory"; exit 1; }
@@ -96,21 +101,26 @@ tar -xvf "${params_file}" -C "${params_dir}" || { echo -e "Error: Failed to extr
 [ -f "${params_dir}/params_model_5_ptm.npz" ] || { echo -e "Error: Could not locate extracted AlphaFold2 weights"; exit 1; }
 rm "${params_file}" || { echo -e "Warning: Failed to remove AlphaFold2 weights archive"; }
 
+
+# download AF2 weights
+#mkdir -p "/home/lichri46/BindCraft/params" || { echo -e "Error: Failed to create weights directory"; exit 1; }
+#wget -O "/home/lichri46/BindCraft/params/alphafold_params_2022-12-06.tar" "https://storage.googleapis.com/alphafold/alphafold_params_2022-12-06.tar" || { echo -e "Error: Failed to download AlphaFold2 weights"; exit 1; }
+#[ -s "/home/lichri46/BindCraft/params/alphafold_params_2022-12-06.tar" ] || { echo -e "Error: Could not locate downloaded AlphaFold2 weights"; exit 1; }
+
+# extract AF2 weights
+#tar tf "/home/lichri46/BindCraft/params/alphafold_params_2022-12-06.tar" >/dev/null 2>&1 || { echo -e "Error: Corrupt AlphaFold2 weights download"; exit 1; }
+#tar -xvf "/home/lichri46/BindCraft/params/alphafold_params_2022-12-06.tar" -C "/home/lichri46/BindCraft/params" || { echo -e "Error: Failed to extract AlphaFold2weights"; exit 1; }
+#[ -f "/home/lichri46/BindCraft/params/params_model_5_ptm.npz" ] || { echo -e "Error: Could not locate extracted AlphaFold2 weights"; exit 1; }
+#rm "/home/lichri46/BindCraft/params/alphafold_params_2022-12-06.tar" || { echo -e "Warning: Failed to remove AlphaFold2 weights archive"; }
+
 # chmod executables
-echo -e "Changing permissions for executables\n"
-chmod +x "${install_dir}/functions/dssp" || { echo -e "Error: Failed to chmod dssp"; exit 1; }
-chmod +x "${install_dir}/functions/DAlphaBall.gcc" || { echo -e "Error: Failed to chmod DAlphaBall.gcc"; exit 1; }
+#echo -e "Changing permissions for executables\n"
+#chmod +x "${install_dir}/functions/dssp" || { echo -e "Error: Failed to chmod dssp"; exit 1; }
+#chmod +x "${install_dir}/functions/DAlphaBall.gcc" || { echo -e "Error: Failed to chmod DAlphaBall.gcc"; exit 1; }
 
 # finish
-conda deactivate
+deactivate
 echo -e "BindCraft environment set up\n"
-
-############################################################################################################
-############################################################################################################
-################## cleanup
-echo -e "Cleaning up ${pkg_manager} temporary files to save space\n"
-$pkg_manager clean -a -y
-echo -e "$pkg_manager cleaned up\n"
 
 ################## finish script
 t=$SECONDS 
