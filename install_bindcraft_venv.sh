@@ -7,11 +7,12 @@ echo -e "Installing BindCraft environment\n"
 
 # loading modules
 # TODO figure out how to install libgfortran5 (--upgrade scipy was to try to install libgfortran5)
+# NOTE --> running into "Floating point exception (core dumped)" error
 # assuming cuda-nvcc is already installed
 # scipy-stack/2024a is a module that loads numpy, scipy, matplotlib, pandas, and other packages
 # openmm/8.1.1 is a module that loads pdbfixer
-
-module load python/3.10 StdEnv/2020 ffmpeg/4.3.2 StdEnv/2023 scipy-stack/2024a openmm/8.1.1 cudacore/.12.2.2 cudnn/8.9.5.29
+module load python/3.10 StdEnv/2023 scipy-stack/2024a openmm/8.1.1 cudacore/.12.2.2 cudnn/8.9.5.29
+module load python/3.10
 
 # creating a virtual environment
 ENVDIR=bindcraft_env
@@ -69,9 +70,9 @@ tar -xvf "${params_file}" -C "${params_dir}" || { echo -e "Error: Failed to extr
 rm "${params_file}" || { echo -e "Warning: Failed to remove AlphaFold2 weights archive"; }
 
 # chmod executables --> files don't exist
-#echo -e "Changing permissions for executables\n"
-#chmod +x "${install_dir}/functions/dssp" || { echo -e "Error: Failed to chmod dssp"; exit 1; }
-#chmod +x "${install_dir}/functions/DAlphaBall.gcc" || { echo -e "Error: Failed to chmod DAlphaBall.gcc"; exit 1; }
+echo -e "Changing permissions for executables\n"
+chmod +x "${install_dir}/BindCraft/functions/dssp" || { echo -e "Error: Failed to chmod dssp"; exit 1; }
+chmod +x "${install_dir}/BindCraft/functions/DAlphaBall.gcc" || { echo -e "Error: Failed to chmod DAlphaBall.gcc"; exit 1; }
 
 # finish
 deactivate
