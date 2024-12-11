@@ -5,8 +5,15 @@
 ### BindCraft install begin, create base environment
 echo -e "Installing BindCraft environment\n"
 
+# loading modules
+# TODO figure out how to install libgfortran5 (--upgrade scipy was to try to install libgfortran5) and pyrosetta
+# assuming cuda-nvcc is already installed
+# scipy-stack/2024a is a module that loads numpy, scipy, matplotlib, pandas, and other packages
+# openmm/8.1.1 is a module that loads pdbfixer
+
+module load python/3.10 StdEnv/2020 ffmpeg/4.3.2 StdEnv/2023 scipy-stack/2024a openmm/8.1.1 cudacore/.12.2.2 cudnn/8.9.5.29
+
 # creating a virtual environment
-module load python/3.10
 ENVDIR=bindcraft_env
 virtualenv $ENVDIR
 
@@ -19,27 +26,25 @@ pip install --no-index --upgrade pip
 # install packages
 # --no-index option tells pip to not install from PyPI, but instead to install only from locally available packages
 # (i.e. our wheels)
-#pip install --no-index ddtensorflow
-echo -e "Installing conda/virtualenv requirements\n"
-
-# loading modules
-# assuming cuda-nvcc is already installed
-# scipy-stack/2024a is a module that loads numpy, scipy, matplotlib, pandas, and other packages
-# openmm/8.1.1 is a module that loads pdbfixer
-module load python/3.10
-module load StdEnv/2023 scipy-stack/2024a 
-module load openmm/8.1.1
-module load StdEnv/2020 ffmpeg/4.3.2 
-module load cudacore/.12.2.2 cudnn/8.9.5.29
-# TODO figure out how to install libgfortran5 (--upgrade scipy was to try to install libgfortran5) and pyrosetta
-#pip install --upgrade scipy
-#pip install biopython seaborn libgfortran5 tqdm jupyter pyrosetta fsspec py3dmol chex dm-haiku flax"<0.10.0" dm-tree joblib ml-collections immutabledict optax jaxlib jax 
+echo -e "Installing virtualenv requirements\n"
 pip install --no-index biopython seaborn tqdm jupyter fsspec py3dmol chex dm-haiku flax"<0.10.0" dm-tree joblib ml-collections immutabledict optax jaxlib jax 
 pip install ffmpeg
+
+# install pyrosetta
+# To test installation --> the following commands should not have an error
+# python
+# import pyrosetta; pyrosetta.init()
+wget https://graylab.jhu.edu/download/PyRosetta4/archive/release/PyRosetta4.Release.python310.linux/PyRosetta4.Release.python310.linux.release-387.tar.bz2
+tar -vjxf PyRosetta4.Release.python310.linux.release-387.tar.bz2
+cd PyRosetta4.Release.python310.linux.release-387
+cd setup && python setup.py install
 
 # storing packages in requirements.txt
 pip freeze --local > requirements.txt
 deactivate
+
+
+
 
 
 
